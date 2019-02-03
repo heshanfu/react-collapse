@@ -38,7 +38,7 @@ export default function Collapse(props) {
   useLayoutEffect(() => {
     console.log('componentDidUpdate');
 
-    if (!content) return;
+    if (!content.current) return;
 
     console.log('componentDidUpdate - real work');
 
@@ -58,14 +58,22 @@ export default function Collapse(props) {
     }
   }
 
+  function getCollapseHeight() {
+    return (props && props.collapseHeight) || '0px';
+  }
+
+  function getCollapsedVisibility() {
+    return props.collapseHeight ? '' : 'hidden';
+  }
+
   function setCollapsed() {
     console.log('setCollapsed');
 
-    if (!content) return;
+    if (!content.current) return;
 
     setCollapseStyle({
-      height: getCollapseHeight(props),
-      visibility: getCollapsedVisibility(props),
+      height: getCollapseHeight(),
+      visibility: getCollapsedVisibility(),
     });
     onChangeCallback();
     console.log('setCollapsed done', collapseStyle);
@@ -74,7 +82,7 @@ export default function Collapse(props) {
   function setCollapsing() {
     console.log('setCollapsing');
 
-    if (!content) return;
+    if (!content.current) return;
 
     const height = getHeight();
 
@@ -96,7 +104,7 @@ export default function Collapse(props) {
     console.log('setExpanding');
 
     nextFrame(() => {
-      if (content) {
+      if (content.current) {
         const height = getHeight();
 
         setCollapseStyle({
@@ -111,7 +119,7 @@ export default function Collapse(props) {
   function setExpanded() {
     console.log('setExpanded');
 
-    if (!content) return;
+    if (!content.current) return;
 
     setCollapseStyle({
       height: '',
@@ -121,13 +129,13 @@ export default function Collapse(props) {
   }
 
   function getHeight() {
-    return `${content.scrollHeight}px`;
+    return `${content.current.scrollHeight}px`;
   }
 
   function onTransitionEnd({ target, propertyName }) {
     console.log('onTransitionEnd', collapseState, propertyName);
 
-    if (target === content && propertyName === 'height') {
+    if (target === content.current && propertyName === 'height') {
       switch (collapseState) {
         case EXPANDING:
           setCollapseState(EXPANDED);
@@ -207,12 +215,4 @@ function nextFrame(callback) {
 
 function isMoving(collapseState) {
   return collapseState === EXPANDING || collapseState === COLLAPSING;
-}
-
-function getCollapseHeight(props) {
-  return (props && props.collapseHeight) || '0px';
-}
-
-function getCollapsedVisibility(props) {
-  return props.collapseHeight ? '' : 'hidden';
 }
