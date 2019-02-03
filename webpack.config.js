@@ -45,7 +45,7 @@ module.exports = (env = {}, argv = {}) => {
         isProd &&
           new OptimizeCSSAssetsPlugin({
             cssProcessorOptions: {
-              sourcemap: true,
+              sourcemap: false,
             },
           }),
       ].filter(Boolean),
@@ -113,21 +113,15 @@ module.exports = (env = {}, argv = {}) => {
             },
             {
               loader: 'css-loader',
-              options: {
-                sourceMap: true,
-              },
+              options: {},
             },
             {
               loader: 'postcss-loader',
-              options: {
-                sourceMap: true,
-              },
+              options: {},
             },
             {
               loader: 'sass-loader',
-              options: {
-                sourceMap: true,
-              },
+              options: {},
             },
           ],
         },
@@ -143,7 +137,6 @@ module.exports = (env = {}, argv = {}) => {
         template: 'src/index.html',
         filename: 'index.html',
       }),
-      // This is necessary to emit hot updates (currently CSS only):
       !isProd && new webpack.HotModuleReplacementPlugin(),
       new WebpackMd5Hash(),
     ].filter(Boolean),
@@ -164,14 +157,14 @@ module.exports = (env = {}, argv = {}) => {
       root: 'React',
       commonjs2: 'react',
       commonjs: 'react',
-      //amd: 'react',
+      amd: 'react',
       umd: 'react',
     };
     config.externals['react-dom'] = {
       root: 'ReactDOM',
       commonjs2: 'react-dom',
       commonjs: 'react-dom',
-      //amd: 'react-dom',
+      amd: 'react-dom',
       umd: 'react-dom',
     };
   }

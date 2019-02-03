@@ -28,7 +28,7 @@ export default function Collapse(props) {
   });
   const [hasReversed, setHasReversed] = useState(false);
 
-  useEffect(() => {
+  useEffect(function didMount() {
     console.log('componentDidMount');
 
     if (collapseState === EXPANDED) setExpanded();
@@ -36,15 +36,32 @@ export default function Collapse(props) {
     onCallback(props.onInit);
   }, []);
 
-  useLayoutEffect(() => {
-    console.log('componentDidUpdate');
+  useLayoutEffect(
+    function didUpdate() {
+      console.log('componentDidUpdate');
 
-    if (!content.current) return;
+      if (!content.current) return;
 
-    console.log('componentDidUpdate - real work');
+      console.log('componentDidUpdate - real work');
 
-    updateStyleStateFromCollapseState();
-  }, [collapseState]);
+      switch (collapseState) {
+        case EXPANDING:
+          setExpanding();
+          break;
+        case COLLAPSING:
+          setCollapsing();
+          break;
+        case EXPANDED:
+          setExpanded();
+          break;
+        case COLLAPSED:
+          setCollapsed();
+          break;
+        // no default
+      }
+    },
+    [collapseState]
+  );
 
   function onCallback(callback) {
     console.log('onCallback');
@@ -83,7 +100,7 @@ export default function Collapse(props) {
 
     if (!content.current) return;
 
-    const height = getHeight();
+    const height = getHeight(); // capture height before setting it to async setState method
 
     setCollapseStyle({
       height,
@@ -92,7 +109,7 @@ export default function Collapse(props) {
 
     nextFrame(() => {
       setCollapseStyle({
-        height: getCollapseHeight(props),
+        height: getCollapseHeight(),
         visibility: '',
       });
       onCallback(props.onChange);
@@ -104,7 +121,7 @@ export default function Collapse(props) {
 
     nextFrame(() => {
       if (content.current) {
-        const height = getHeight();
+        const height = getHeight(); // capture height before setting it to async setState method
 
         setCollapseStyle({
           height,
@@ -147,29 +164,6 @@ export default function Collapse(props) {
     }
   }
 
-  function updateStyleStateFromCollapseState() {
-    switch (collapseState) {
-      case EXPANDING:
-        setExpanding();
-        break;
-      case COLLAPSING:
-        setCollapsing();
-        break;
-      case EXPANDED:
-        setExpanded();
-        break;
-      case COLLAPSED:
-        setCollapsed();
-        break;
-      // no default
-    }
-  }
-
-  let style = {
-    transition,
-    ...collapseStyle,
-  };
-
   // getDerivedStateFromProps
   let didOpen = collapseState === EXPANDED || collapseState === EXPANDING;
 
@@ -183,6 +177,10 @@ export default function Collapse(props) {
   }
   // END getDerivedStateFromProps
 
+  const style = {
+    transition,
+    ...collapseStyle,
+  };
   const ElementType = elementType || 'div';
   const collapseClassName = `${className || 'collapse-css-transition'} --is-${collapseState}`;
 
