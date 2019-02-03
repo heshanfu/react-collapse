@@ -35,7 +35,7 @@ export default function Collapse(props) {
     if (collapseState === EXPANDED) setExpanded();
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     console.log('componentDidUpdate');
 
     if (!content.current) return;
@@ -48,14 +48,13 @@ export default function Collapse(props) {
   function onChangeCallback() {
     console.log('onChangeCallback');
 
-    if (props.onChange) {
+    props.onChange &&
       props.onChange({
         collapseState,
         collapseStyle,
         hasReversed,
         isMoving: isMoving(collapseState),
       });
-    }
   }
 
   function getCollapseHeight() {
@@ -76,7 +75,6 @@ export default function Collapse(props) {
       visibility: getCollapsedVisibility(),
     });
     onChangeCallback();
-    console.log('setCollapsed done', collapseStyle);
   }
 
   function setCollapsing() {
@@ -171,27 +169,21 @@ export default function Collapse(props) {
     ...collapseStyle,
   };
 
-  console.log('render', style);
-
-  //
+  // getDerivedStateFromProps
   let didOpen = collapseState === EXPANDED || collapseState === EXPANDING;
 
   if (!didOpen && props.isOpen) {
-    console.log('EXPANDING');
     setHasReversed(collapseState === COLLAPSING);
     setCollapseState(EXPANDING);
   }
-
   if (didOpen && !props.isOpen) {
-    console.log('COLLAPSING');
     setHasReversed(collapseState === EXPANDING);
     setCollapseState(COLLAPSING);
   }
+  // END getDerivedStateFromProps
 
   const ElementType = elementType || 'div';
   const collapseClassName = `${className || 'collapse-css-transition'} --is-${collapseState}`;
-
-  console.log('isOpen', isOpen);
 
   return (
     <ElementType ref={content} style={style} className={collapseClassName} onTransitionEnd={onTransitionEnd} {...attrs}>
