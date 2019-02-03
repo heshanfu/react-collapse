@@ -14,6 +14,7 @@ export default function Collapse(props) {
     render,
     elementType,
     collapseHeight, // exclude from attrs
+    onInit, // exclude from attrs
     onChange, // exclude from attrs
     isOpen, // exclude from attrs
     ...attrs
@@ -30,12 +31,12 @@ export default function Collapse(props) {
   useEffect(() => {
     console.log('componentDidMount');
 
-    onChangeCallback();
-
     if (collapseState === EXPANDED) setExpanded();
+
+    onCallback(props.onInit);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     console.log('componentDidUpdate');
 
     if (!content.current) return;
@@ -45,11 +46,11 @@ export default function Collapse(props) {
     updateStyleStateFromCollapseState();
   }, [collapseState]);
 
-  function onChangeCallback() {
-    console.log('onChangeCallback');
+  function onCallback(callback) {
+    console.log('onCallback');
 
-    props.onChange &&
-      props.onChange({
+    callback &&
+      callback({
         collapseState,
         collapseStyle,
         hasReversed,
@@ -74,7 +75,7 @@ export default function Collapse(props) {
       height: getCollapseHeight(),
       visibility: getCollapsedVisibility(),
     });
-    onChangeCallback();
+    onCallback(props.onChange);
   }
 
   function setCollapsing() {
@@ -94,7 +95,7 @@ export default function Collapse(props) {
         height: getCollapseHeight(props),
         visibility: '',
       });
-      onChangeCallback();
+      onCallback(props.onChange);
     });
   }
 
@@ -109,7 +110,7 @@ export default function Collapse(props) {
           height,
           visibility: '',
         });
-        onChangeCallback();
+        onCallback(props.onChange);
       }
     });
   }
@@ -123,7 +124,7 @@ export default function Collapse(props) {
       height: '',
       visibility: '',
     });
-    onChangeCallback();
+    onCallback(props.onChange);
   }
 
   function getHeight() {
