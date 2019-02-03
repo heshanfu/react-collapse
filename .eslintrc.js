@@ -24,6 +24,7 @@ module.exports = {
     node: true
   },
   rules: {
+    'react-hooks/rules-of-hooks': 'error',
     'no-unused-vars': [
       1, {
         argsIgnorePattern: 'res|next|^err'
@@ -101,5 +102,5 @@ module.exports = {
       }
     ]
   },
-  plugins: ['prettier']
+  plugins: ['react-hooks', 'prettier']
 };
