@@ -20,7 +20,7 @@ export default function Collapse(props) {
     ...attrs
   } = props;
 
-  const content = useRef(null);
+  const contentRef = useRef(null);
   const [collapseState, setCollapseState] = useState(props.isOpen ? EXPANDED : COLLAPSED);
   const [collapseStyle, setCollapseStyle] = useState({
     height: props.collapseHeight || '0px',
@@ -40,7 +40,7 @@ export default function Collapse(props) {
     function didUpdate() {
       console.log('componentDidUpdate');
 
-      if (!content.current) return;
+      if (!contentRef.current) return;
 
       console.log('componentDidUpdate - real work');
 
@@ -86,7 +86,7 @@ export default function Collapse(props) {
   function setCollapsed() {
     console.log('setCollapsed');
 
-    if (!content.current) return;
+    if (!contentRef.current) return;
 
     setCollapseStyle({
       height: getCollapseHeight(),
@@ -98,9 +98,9 @@ export default function Collapse(props) {
   function setCollapsing() {
     console.log('setCollapsing');
 
-    if (!content.current) return;
+    if (!contentRef.current) return;
 
-    const height = getHeight(); // capture height before setting it to async setState method
+    const height = getContentHeight(); // capture height before setting it to async setState method
 
     setCollapseStyle({
       height,
@@ -120,8 +120,8 @@ export default function Collapse(props) {
     console.log('setExpanding');
 
     nextFrame(() => {
-      if (content.current) {
-        const height = getHeight(); // capture height before setting it to async setState method
+      if (contentRef.current) {
+        const height = getContentHeight(); // capture height before setting it to async setState method
 
         setCollapseStyle({
           height,
@@ -135,7 +135,7 @@ export default function Collapse(props) {
   function setExpanded() {
     console.log('setExpanded');
 
-    if (!content.current) return;
+    if (!contentRef.current) return;
 
     setCollapseStyle({
       height: '',
@@ -144,14 +144,14 @@ export default function Collapse(props) {
     onCallback(props.onChange);
   }
 
-  function getHeight() {
-    return `${content.current.scrollHeight}px`;
+  function getContentHeight() {
+    return `${contentRef.current.scrollHeight}px`;
   }
 
   function onTransitionEnd({ target, propertyName }) {
     console.log('onTransitionEnd', collapseState, propertyName);
 
-    if (target === content.current && propertyName === 'height') {
+    if (target === contentRef.current && propertyName === 'height') {
       switch (collapseState) {
         case EXPANDING:
           setCollapseState(EXPANDED);
@@ -185,22 +185,20 @@ export default function Collapse(props) {
   const collapseClassName = `${className || 'collapse-css-transition'} --is-${collapseState}`;
 
   return (
-    <ElementType ref={content} style={style} className={collapseClassName} onTransitionEnd={onTransitionEnd} {...attrs}>
+    <ElementType
+      ref={contentRef}
+      style={style}
+      className={collapseClassName}
+      onTransitionEnd={onTransitionEnd}
+      {...attrs}
+    >
       {typeof render === 'function' ? render(collapseState) : children}
     </ElementType>
   );
 }
 
-/*
-function afterFrame(callback) {
-  // https://nolanlawson.com/2018/09/25/accurately-measuring-layout-on-the-web/
-  // https://github.com/andrewiggins/yield-to-browser
-  requestAnimationFrame(() => setTimeout(callback, 0));
-}
-*/
-
 function nextFrame(callback) {
-  // Ensure it is always visible on collapsing
+  // Ensure it is always visible on collapsing, afterFrame didn't work
   requestAnimationFrame(() => requestAnimationFrame(callback));
 }
 
